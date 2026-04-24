@@ -1,5 +1,6 @@
 # Node Hierarchy Analyzer (Full Stack Project)
 
+
 ## Overview
 
 Node Hierarchy Analyzer is a full-stack application that processes hierarchical node relationships and generates structured insights. It validates input, constructs tree structures, detects cycles, computes depth, and provides summary metrics.
@@ -30,6 +31,10 @@ https://github.com/Shashikumar-ezhilarasu/Node-Hierarchy-Analyzer--backend
 https://github.com/Shashikumar-ezhilarasu/Node-Hierarchy-Analyzer-frontend
 
 ---
+
+## Expected Output 
+<img width="855" height="804" alt="image" src="https://github.com/user-attachments/assets/b238591d-5dd2-4601-ab17-afbe91939763" />
+
 
 ## System Architecture
 
