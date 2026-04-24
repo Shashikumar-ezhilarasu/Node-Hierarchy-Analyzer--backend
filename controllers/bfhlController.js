@@ -93,9 +93,9 @@ const processGraphData = (req, res) => {
     // Construct final response
     const responsePayload = {
       is_success: true,
-      user_id: "shashikumarezhil_15082001",
-      email_id: "shashikumarezhil@example.com",
-      college_roll_number: "ROLL123",
+      user_id: "shashikumar_ezhilarasu_15082001",
+      email_id: "shashikumarezhilarasu@gmail.com",
+      college_roll_number: "RA2311003020094",
       hierarchies: hierarchies,
       invalid_entries: invalidEntries,
       duplicate_edges: duplicateEdges,
