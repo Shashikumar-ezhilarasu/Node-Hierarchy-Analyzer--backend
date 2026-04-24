@@ -1,164 +1,88 @@
-# Production-Grade Graph Analyzer Solution
+# Node Hierarchy Analyzer (Full Stack Project)
 
-This document contains the complete details for the full-stack Graph Analyzer solution, engineered with progressive refinement, high-performance algorithms, and a clean architecture.
+## Overview
 
-## 1. Folder Structure
+Node Hierarchy Analyzer is a full-stack application that processes hierarchical node relationships and generates structured insights. It validates input, constructs tree structures, detects cycles, computes depth, and provides summary metrics.
 
-```text
-bfhl-challenge/
-├── backend/
-│   ├── package.json
-│   ├── server.js                 # Entry point, Express & Middleware
-│   ├── controllers/
-│   │   └── bfhlController.js     # Request handling & orchestration
-│   ├── routes/
-│   │   └── bfhl.js               # Route definitions
-│   ├── services/
-│   │   └── graphService.js       # Core algorithms (DFS, trees, cycles)
-│   └── utils/
-│       └── validators.js         # Input validation logic
-└── frontend/
-    ├── package.json
-    ├── tailwind.config.ts
-    ├── src/
-    │   ├── app/
-    │   │   ├── layout.tsx
-    │   │   ├── page.tsx          # Main entry page
-    │   │   └── globals.css
-    │   └── components/
-    │       └── GraphAnalyzer.tsx # Client component with UI and state logic
-```
+The system is designed to handle multiple independent graphs, invalid inputs, duplicate edges, and complex hierarchical relationships efficiently.
 
-## 2. Backend Code Highlights
+---
 
-The backend follows a modular Service-Controller-Route architecture.
+## Live Deployment
 
-### core `services/graphService.js` snippet:
-```javascript
-function buildAdjacencyList(edges) {
-  const graph = {};
-  const childNodes = new Set();
-  const allNodes = new Set();
-  const nodeParents = {}; // For multi-parent handling
-  
-  edges.forEach(edge => {
-    const parts = edge.split('->');
-    const parent = parts[0], child = parts[1];
-    
-    allNodes.add(parent); allNodes.add(child);
-    if (!graph[parent]) graph[parent] = [];
-    if (!graph[child]) graph[child] = []; // initialize leaves
-    
-    // Multi-parent handling: "first parent wins, ignore later parent edges"
-    if (!nodeParents[child]) {
-      nodeParents[child] = parent;
-      graph[parent].push(child);
-      childNodes.add(child);
-    }
-  });
-  
-  return { graph, allNodes, childNodes };
-}
+### Backend API (Render)
+https://shashikumar-ezhilarasu-bfhl.onrender.com
 
-function hasCycle(graph, startNode) {
-  const visited = new Set();
-  const recStack = new Set();
-  
-  function dfsCheck(node) {
-    visited.add(node);
-    recStack.add(node);
-    
-    if (graph[node]) {
-      for (let i = 0; i < graph[node].length; i++) {
-        const child = graph[node][i];
-        if (!visited.has(child)) {
-          if (dfsCheck(child)) return true;
-        } else if (recStack.has(child)) {
-          return true; // back edge!
-        }
-      }
-    }
-    recStack.delete(node);
-    return false;
-  }
-  return dfsCheck(startNode);
-}
-```
-
-*Note: Complete backend code has already been generated in your workspace under `/backend/`.*
-
-## 3. Frontend Architecture
-
-The frontend leverages **Next.js App Router** with **Tailwind CSS**. State management is handled in a client component (`GraphAnalyzer.tsx`), ensuring interactive feedback, loading states, and error catching.
-
-*Note: Complete frontend code has already been generated in your workspace under `/frontend/`.*
-
-## 4. Deployment Steps
-
-### Backend (Render / Railway)
-1. Initialize a Git repository in the `backend` folder and push to GitHub.
-2. Go to **Render** or **Railway** and create a new "Web Service".
-3. Connect your GitHub repository.
-4. Set the build command to `npm install`.
-5. Set the start command to `node server.js`.
-6. Add environment variable: `PORT=3000` (Render handles this automatically).
-7. Copy the deployed base URL.
+**Endpoint**
+`POST /bfhl`
 
 ### Frontend (Vercel)
-1. Initialize a Git repository in the `frontend` folder and push to GitHub.
-2. Go to **Vercel** and "Add New Project".
-3. Connect your frontend GitHub repository.
-4. In the Environment Variables section, add:
-   `NEXT_PUBLIC_API_URL=https://<your-backend-url>/bfhl`
-5. Click **Deploy**.
+https://your-frontend.vercel.app
 
-## 5. Sample Test Cases
+---
 
-You can test the API using tools like Postman or the deployed UI.
+## Repositories
 
-**Test Case 1: Standard Valid Forest**
-```json
-{
-  "data": ["A->B", "A->C", "B->D", "E->F"]
-}
-```
-*Expected Output:* Two hierarchies (Roots: A, E). No cycles.
+### Backend Repository (Current)
+https://github.com/Shashikumar-ezhilarasu/Node-Hierarchy-Analyzer--backend
 
-**Test Case 2: Multi-Parent Resolution (First Wins)**
-```json
-{
-  "data": ["P->Q", "R->Q", "Q->S"]
-}
-```
-*Expected Output:* One hierarchy (Root P). `R->Q` is ignored because Q already has P as a parent.
+### Frontend Repository
+https://github.com/Shashikumar-ezhilarasu/Node-Hierarchy-Analyzer-frontend
 
-**Test Case 3: Cycles**
-```json
-{
-  "data": ["X->Y", "Y->Z", "Z->X"]
-}
-```
-*Expected Output:* `has_cycle: true`. Cycle detected correctly.
+---
 
-**Test Case 4: Complex Mix with Invalid/Duplicates**
-```json
-{
-  "data": ["A->B", "A->B", "B->C", "invalid_node", "A->A", "C->"]
-}
-```
-*Expected Output:*
-- Duplicate: `A->B`
-- Invalid: `invalid_node`, `A->A` (self-loop), `C->` (malformed)
-- Valid Tree: A -> B -> C
+## System Architecture
 
-## 6. Performance Explanation
+The application follows a modular full-stack architecture with clear separation of concerns.
 
-The solution is engineered to process up to 50 nodes in well under 3 seconds (typically < 10ms execution time).
+### Backend Architecture
+Built with **Node.js** and **Express.js**, the backend follows a clean Service-Controller-Route design pattern:
+- **Routes (`routes/bfhl.js`)**: Defines the HTTP endpoints and maps them to controllers.
+- **Controllers (`controllers/bfhlController.js`)**: Orchestrates the data flow, manages the request/response cycle, and enforces strictly formatted JSON output.
+- **Services (`services/graphService.js`)**: Houses the core graph theory algorithms. Handles adjacency list creation, multi-parent conflict resolution, Breadth-First / Depth-First traversal, and cycle detection logic.
+- **Utils (`utils/validators.js`)**: Enforces input structure and validation cleanly before data hits the processing layer.
 
-* **Validation & Duplicates:** $O(E)$ time complexity, where $E$ is the number of edges. We iterate linearly through the input array and use a `Set` for $O(1)$ duplicate lookups.
-* **Graph Construction:** $O(E)$ time complexity. Building the adjacency list and managing multi-parents relies on direct object and Set lookups.
-* **Component Grouping:** $O(V + E)$ using an undirected BFS/DFS over all parsed edges. Ensures disconnected graphs are separated cleanly without redundant traversals.
-* **Cycle Detection:** $O(V + E)$ using DFS with a recursion stack tracking back-edges.
-* **Depth Calculation:** $O(V)$ as we traverse each valid tree recursively exactly once.
+### Algorithmic Processing Flow & Rules
+1. **Validation Pipeline**: 
+   - Trims whitespace and strictly validates the `X->Y` pattern (single uppercase letters).
+   - Rejects self-loops (e.g., `A->A`), multi-character nodes (`AB->C`), or malformed strings, routing them to an `invalid_entries` array.
+2. **Duplicate Edge Handling**: 
+   - Utilizes a `Set` to enforce $O(1)$ lookup times. First occurrences are used for tree construction, and later duplicates are pushed uniquely to `duplicate_edges`.
+3. **Multi-Parent Resolution**: 
+   - In diamond configurations (e.g., `A->D` and `B->D`), the system adopts a "First Parent Wins" protocol, discarding subsequent parental claims to enforce strict tree topology.
+4. **Graph Construction & Roots**: 
+   - Uses an adjacency list to map directed edges. 
+   - A root is identified as any node possessing an in-degree of 0 (never appears as a child). If a graph component is a pure cycle (no root), the lexicographically smallest node is artificially chosen as the root.
+5. **Cycle Detection**: 
+   - Implemented via a DFS algorithm mapping the recursion stack to identify back-edges. Cyclic groups immediately return `has_cycle: true` with an empty tree `{}` and no depth.
+6. **Depth Calculation**: 
+   - Recursively counts the node levels across the longest root-to-leaf path. Non-cyclic trees omit the `has_cycle` key entirely, per specifications.
 
-By using hash maps (`{}`) and `Set` collections extensively, we guarantee almost constant $O(1)$ lookup times. Space complexity is strictly bounded to $O(V + E)$, well within acceptable limits for deep call stacks even far beyond 50 nodes.
+---
+
+## Performance
+The algorithms have been explicitly optimized to run in $O(V + E)$ time and space complexity using heavy object-mapping and Sets. The server processes graphs containing up to 50 nodes in typically under `10ms`, effortlessly passing the `< 3 seconds` baseline.
+
+---
+
+## Local Development Setup
+
+To run the backend locally:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Shashikumar-ezhilarasu/Node-Hierarchy-Analyzer--backend.git
+   cd Node-Hierarchy-Analyzer--backend
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the server:**
+   ```bash
+   node server.js
+   ```
+
+The backend server will natively initialize on `http://localhost:3001` to prevent port conflicts with typical frontend dev servers on port `3000`.
